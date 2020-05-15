@@ -1,0 +1,147 @@
+
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'HyperLedger Fabric笔记',
+  date: '2018-08-06 22:05:00',
+  description: '',
+  image: 'https://wlimg.oss-cn-beijing.aliyuncs.com/img/hb/1.jpeg!l',
+}
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/hb/1.jpeg!l) 
+
+HyperLedger Fabric简介
+--------------------
+
+Hyperledger Fabric，它是由 IBM 带头发起的一个联盟链项目，于 15 年底移交给 Linux 基金会，成为开源项目。Hyperledger Fabric 可用于全球供应链管理、金融交易、资产账和去中心化的社交网络等场景，但无意以此来构建一种加密货币。 **Hyperledger Fabric用模块化架构作为开发区块链程序或解决方案的基础，允许一些部件例如共识算法和成员服务都可即插即用。** HyperLedger Fabric是一个区块链解决方案，更倾向于联盟链或私有链方向。
+
+### HyperLedger Fabric组成
+
+#### 资产定义
+
+资产这里理解为任何具有货币价值的东西，它们都可以通过网络进行交易，无论是超市商品到古董车再到货币期货都属于资产。
+
+#### 智能合约
+
+链码(chaincode)即Fabric的智能合约，分为系统链码和用户链码。链码的执行由事务排序划分，限制了节点类型间的信任和验证级别，并优化了网络的可伸缩性和性能。
+
+#### 账本特征
+
+账本不可变的、共享的并且为每个通道（channel）编码了整个事务历史，还包含了类似sql的查询功能，用于高效的审计和解决争议。
+
+#### 隐私通道
+
+多通道（channel）交易的设计方案可以确保竞争的企业和受监管的行业在一个公共网络上交换资产时的高度隐私及保密性。
+
+#### 成员安全
+
+Hyperledger Fabric只允许被授权加盟的成员参与数据维护，且成员间相互认可所有的交易都会被彼此发现和跟踪。这种方式提供了一个可信的区块链网络。
+
+#### 共识机制
+
+共识策略的设定是为了达成一致的一种独特的方法，它可以实现企业间所需的灵活性和可伸缩性。
+
+### HyperLedger Fabric功能
+
+#### 身份管理
+
+为了支持被许可的网络，Hyperledger Fabric提供了一个成员身份服务（membership identity service），它管理用户id并对网络上的所有参与者进行身份验证。访问控制列表可以通过特定网络操作的授权来提供额外的权限。例如，一个特定的用户ID可以被允许调用一个链代码应用程序，但是阻止了部署新的链代码。关于Hyperledger Fabric网络的一个真理是，成员相互了解（身份），但他们不知道彼此在做什么（隐私和机密性）。
+
+#### 隐私和机密性
+
+Hyperledger Fabric使得竞争的商业利益和任何需要私人的、机密的交易的团体能够在同一个被许可的网络上共存。私有通道（channel）是受限制的消息传递路径，可用于为网络成员的特定子集提供事务隐私和机密性。所有的数据，包括事务、成员和通道信息，都是不可见的，任何网络成员都不能访问该通道。
+
+#### 高效处理能力
+
+Hyperledger Fabric通过节点类型分配网络角色。执行事务的操作从事务排序和提交验证中分离出来，以便向网络提供并发性控制和并行性操作。在排序之前执行事务使每个对等节点能够同时处理多个事务。这种并发执行提高了每个对等点的处理效率，并加速了对排序服务的事务的交付。 除了启用并行处理之外，还可以从事务执行和分类维护的需求中提取节点，而对等节点则从排序（一致的）工作负载中解放出来。角色的这种分支也限制了授权和身份验证所需的处理；所有的对等节点不需要信任所有的排序节点，反之亦然，因此，在一个节点上的进程可以独立于另一个节点进行验证。
+
+#### Chaincode功能
+
+Chaincode应用程序对通道（channel）中特定类型的事务调用的逻辑进行编码。例如，为资产所有权变更定义参数的Chaincode，确保所有转移所有权的交易都服从相同的规则和要求。系统Chaincode是一个特殊的Chaincode，它定义了整个通道（channel）的操作参数。生命周期和配置系统Chaincode定义了通道（channel）的规则；认可和验证系统Chaincode定义了支持和验证事务的需求。
+
+#### 模块化设计
+
+Hyperledger Fabric实现了一个模块化的架构，为网络设计师提供功能选择。例如，特定的识别、排序（一致）和加密的算法可以被插入到任何一个Hyperledger Fabric的网络中。其结果是一个通用的区块链架构，任何行业或公共领域都可以采用，并保证其网络将在市场、监管和地理界线之间进行互操作。
+
+HyperLedger Fabric搭建
+--------------------
+
+准备：docker环境、go环境
+
+*   搭建fabric-peer容器
+
+    docker pull hyperledger/fabric-tools
+    docker pull hyperledger/fabric-orderer
+    docker pull hyperledger/fabric-peer
+    docker pull hyperledger/fabric-couchdb
+    docker pull hyperledger/fabric-kafka
+    docker pull hyperledger/fabric-ca
+    docker pull hyperledger/fabric-zookeeper
+    docker pull hyperledger/fabric-baseos
+    
+
+*   下载Fabric源码
+
+    go get github.com/hyperledger/fabric
+    
+
+fabric/examples/e2e_cli
+
+### 运行e2e_cli测试项目
+
+    fabric/examples/e2e_cli
+    bash network_setup.sh up
+    
+
+    Creating peer1.org2.example.com ... done
+    Creating zookeeper1             ... done
+    Creating peer0.org1.example.com ... done
+    Creating peer1.org1.example.com ... done
+    Creating zookeeper2             ... done
+    Creating peer0.org2.example.com ... done
+    Creating zookeeper0             ... done
+    Creating kafka0                 ... done
+    Creating kafka1                 ... done
+    Creating kafka2                 ... done
+    Creating kafka3                 ... done
+    Creating orderer.example.com    ... done
+    Creating cli                    ... done
+    
+
+    ===================== All GOOD, End-2-End execution completed =====================
+    
+    
+     _____   _   _   ____            _____   ____    _____
+    | ____| | \ | | |  _ \          | ____| |___ \  | ____|
+    |  _|   |  \| | | | | |  _____  |  _|     __) | |  _|
+    | |___  | |\  | | |_| | |_____| | |___   / __/  | |___
+    |_____| |_| \_| |____/          |_____| |_____| |_____|
+    
+
+#### configtx.yaml来生成创世区块
+
+    ./bin/configtxgen -profile TwoOrgsOrdererGenesis -outputBlock ./channel-artifacts/genesis.block
+    
+
+Hyperledger Fabric背书
+--------------------
+
+背书策略用于指导peer如何确定交易是否得到了的认可。当一个peer接收到一个事务时，它会调用与事务的Chaincode相关联的VSCC（验证系统链代码），作为事务验证流程的一部分，以确定交易的有效性。一个交易包含了一个或多个peer背书节点中的背书支持。 VSCC的任务是做出以下决定：
+
+*   所有的背书都是有效的（也就是说，它们是有效的签名，而不是预期的消息）。
+*   有适当数量的背书
+*   背书来自预期的来源(s)
+
+     使用这种语法，chaincode部署人员可以请求对chaincode的背书在指定的策略上进行验证。注意-默认策略需要一个来自默认MSP的成员的签名。如果在实例化chaincode时，在CLI中没有指定策略，则使用此方法。
+     可以在实例化时使用“-P”关键词指定策略，然后执行策略。
+    peer chaincode instantiate -C \<channelid\> -n mycc -P "AND('Org1.member', 'Org2.member')"
+     这个命令使用 AND('Org1.member', 'Org2.member') 背书策略来部署chaincode mycc，该策略要求Org1和Org2的成员两个都必须签署事务。
+    
+
+Hyperledger Fabric Chaincode
+----------------------------
+
+chaincode是一个程序，它是使用Go语言编写的，最终在Java等其他编程语言中实现了指定的接口。chaincode运行在一个被背书peer进程独立出来的安全的Docker容器中。chaincode通过应用程序提交的事务初始化和管理账本状态。 chaincode通常处理被网络成员认可的业务逻辑，因此它被认为是一种“智能合约”。由chaincode创建的状态只作用于该chaincode，而不能通过另一个chaincode直接访问。但是，在同一个网络中，给定适当的权限，chaincode可以调用另一个chaincode来访问它的状态。 **智能合约生命周期** Hyperledger Fabric的API支持与区块链网络中的各个节点进行交互——peers、orderers和MSPs——它还允许其中一个在支持的背书节点上打包、安装、实例化和升级chaincode。尽管Hyperledger Fabric可以用来管理chaincode的生命周期，但它还是提供了特定语言的sdk抽象了Hyperledger Fabric API的细节，以促进应用程序的开发。另外，可以通过CLI直接访问Hyperledger Fabric API。 官方提供了四个命令来管理一个chaincode的生命周期： package、install、instantiate和upgrade。在未来的版本中，官方也正在考虑添加stop和start命令操作事务来禁用和重新启用chaincode，而不必实际卸载它。在成功安装并实例化了一个chaincode之后，chaincode就处于活跃中（正在运行），并且可以通过调用事务处理事务。在安装完毕后，也可以在任何时间都对chaincode进行升级。 未完待续
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

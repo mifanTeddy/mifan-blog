@@ -1,0 +1,441 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: '浅析椭圆曲线加密算法',
+  date: '2019-10-30 15:34:00',
+  description: '',
+  image: 'https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/0.png!l',
+}
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/0.png!l)
+
+
+## 数学基础
+
+#### 黎曼几何中的“平行线”
+
+欧几里得《几何原本》中提出五条公设：
+```
+1,过相异两点，能作且只能作一直线。
+2,有限直线可以任意地延长。
+3,以任一点为圆心、任意长为半径，可作一圆。
+4,凡直角都相等。
+5,两直线被第三条直线所截，如果同侧两内角和小于两个直角， 则两直线作会在该侧相交（平行公设）。
+```
+
+《几何原本》中只有第29条命题，
+
+```
+一条直线与两条平行直线相交,则所成的内错角相等,同位角相等,且同旁内角之和等于两直角
+```
+
+才用到了第五公设，其他命题并没有使用到，因此一些数学家提出疑问：第五公设能否不作为公设，而作为一条定理？能否靠前四条公设证明之？因此出现了长期的关于“平行线理论”的讨论。欧氏几何讲“过直线外一点有且只有一条直线与已知直线平行”，后面就有个罗氏几何（罗巴切夫斯基）讲“过直线外一点至少存在两条直线和已知直线平行”，那么是否有“过直线外一点，不能做直线和已知直线平行？”，黎曼几何就回答了这个问题。
+
+黎曼几何中不承认平行线的存在，即在同一平面内任何两条直线都有公共点（交点）。另一条公设讲：直线可以无限延长，但总的长度是有限的。
+
+黎曼几何也被称为椭圆几何。椭圆曲线就是基于黎曼几何的“平行线理论”。
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/1.png)
+
+定义平行线相较于无穷远点P∞，使平面上所有直线都有唯一的交点。
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/2.png)
+
+无穷远点的性质：
+```
+一条直线只有一个无穷远点。
+平面上一组相互平行的两条直线有公共的无穷远点。
+平面上任何相交的直线有不同的无穷远点（否则就会存在两个交点）。
+平面上全体无穷远点构成一条无穷远直线。
+平面上全体无穷远点与全体平常点构成射影平面。
+```
+#### 射影平面坐标系
+
+射影平面坐标系是对笛卡尔平面直角坐标系的扩展。普通平面直角坐标系无法表示无穷远点，因此为了表示无穷远点的坐标，产生了射影平面坐标系。
+
+射影平面点的表示：
+
+对普通平面直角坐标系上的点A(x,y)，令x=X/Z，y=Y/Z(Z≠0)，则点A在射影平面上表示为(X:Y:Z)。
+
+那么对于平面直角做标记上的点(1,2)，在射影平面上坐标为(Z:2Z:Z)Z≠0。
+
+直线方程表示为aX+bY+cZ=0。
+
+两条平行线L1: X+2Y+3Z=0与L2: X+2Y+Z=0，因为L1||L2，所以Z=0，X+2Y=0，所以无穷远点坐标为(-2Y:Y:0)。
+
+#### 椭圆曲线方程
+
+一条椭圆曲线在射影平面满足一齐次方程——威尔斯特拉斯方程：
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/3.png)
+
+
+的所有点的集合，且曲线上的每个点都是非奇异（光滑）的。
+
+椭圆曲线并不是椭圆，是由椭圆曲线的描述方程类似于计算椭圆周长的方程而得名。
+
+“非奇异”或“光滑”，可以理解为，满足方程的任意一点都存在切线。虽然有的方程满足上面的形式，但是并不是椭圆曲线。
+
+椭圆曲线上有一个无穷远点(0:1:0)且满足方程。
+
+如何把椭圆曲线放到平面直角坐标系呢？射影平面坐标系只多了个无穷远点，因此求出平面直角坐标系上椭圆曲线所有平常点组成的曲线方程，再加上无穷远点，就构成了椭圆曲线。
+
+把x=X/Z,y=Y/Z代入威尔斯特拉斯方程，得到普通方程：
+
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/4.png)
+
+
+
+#### 椭圆曲线上的群操作
+
+
+假设用加法符号“+”表示群操作，给定两个点及其坐标，P(x1,y1)，Q(x2,y2)，计算第三个点R坐标：
+
+P+Q=R (x1,y1)+(x2,y2)=(x3,y3)
+
+在椭圆曲线上定义阿贝尔群，其运算法则：
+
+任意选取椭圆曲线上两点P、Q（若P、Q两点重合，则作P点的切线）作直线交于椭圆曲线的另一点R'，过R'作y轴平行线交于R，规定P+Q=R。
+
+相异点相加P+Q：
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/5.png)
+相同点相加P+P：
+
+
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/6.png)
+
+
+若有k个相同的P点相加，记作kP。
+
+#### 有限域上的椭圆曲线
+实数域上的椭圆曲线是连续的，并不适用于加密，考虑到加密算法的可实现性，要把椭圆曲线定义在有限域上，使之变成离散的点。
+
+给定一个有限域Fp：
+```
+Fp只有p（p为素数）个元素0,1,2...p-2,p-1；
+Fp的加法（a+b）法则是a+b≡c(mod p)；
+Fp的乘法（a×b）法则是a×b≡c(mod p)；
+Fp的除法（a÷b）法则是a÷b≡c(mod p)，即a×b^-1≡c(mod p)，b^-1为b的逆元；
+Fp的单位元是1，零元是0；
+Fp域内运算满足交换律、结合律、分配律。
+```
+
+并非所有的椭圆曲线都适合加密。下面定义一类适合加密的椭圆曲线：
+
+椭圆曲线Ep(a,b)，p为质数，x,y∈[0,p-1]:
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/7.png)
+
+
+选择两个满足下列约束条件的小于p的非负整数a、b：
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/8.png)
+
+无穷远点O∞是零元，有O∞+O∞=O∞，O∞+P=P；
+
+P(x,y)的负元是(x,-y)，有P+(-P)=O∞；
+
+P(x1,y1)，Q(x2,y2)和R(x3,y3)有如下关系：
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/9.png)
+
+其中若P=Q则
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/10.png)
+
+若P≠Q则
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/11.png)
+
+
+k为直线斜率。
+#### 椭圆曲线上点的阶
+
+如果椭圆曲线上一点P，存在最小的正整数n使得数乘nP=O∞，则称n为P的阶，若n不存在，则P为无限阶。
+
+在有限域上定义的椭圆曲线，所有点的阶n都是存在的。
+
+### 加密与解密
+等式Q=dG（Q，G为Ep(a,b)上的点，d为小于n（n是点G的阶）的整数），在有限域上的椭圆曲线，给定d和G，根据有限域上的加法法则，很容易计算出Q；但给定Q和G，很难计算出d。这就是椭圆曲线的离散对数难题。
+
+点G称为基点，d为私钥，Q为公钥。
+
+
+##### 加解密步骤
+```
+Alice选定一条椭圆曲线Ep(a,b)，并取曲线上一点作为基点G。
+Alice选择一个d作为私钥，并生成公钥Q=dG。
+Alice将曲线Ep(a,b)和点Q、G发给Bob。
+Bob收到信息后，将待传输的明文编码到曲线Ep(a,b)上的一点M，并选择一个随机整数k（k<n）。
+Bob计算点C1=M+kQ；C2=kG。
+Bob将C1 C2发给Alice。
+Alice收到信息后，计算C1-dC2=M+kQ-d(kG)=M+k(dG)-d(kG)=M，得到点M，再对点M进行解码就得到明文。
+```
+
+攻击者从信道中截取信息，只能得到Ep(a,b),Q,G,C1,C2，而通过Q、G求d或通过C1、C2求k都是困难的，因此攻击者无法获取到明文。
+
+密码学中描述一条有限域上的椭圆曲线常用到六个参量：
+T=(p,a,b,G,n,h)
+
+p、a、b用来确定一条椭圆曲线，G为基点，n为点G的阶，h是有限域椭圆曲线上所有点的个数m与n相除得到的整数部分。
+
+这几个参量取值的选择，直接影响了加密的安全性。一般满足如下条件：
+
+1,p越大越好，但越大，计算速度会变慢，200位左右可满足一般安全需求；
+
+2,p≠n×h； ![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/12.png)
+
+
+3, 1≤t＜20
+
+4,  ![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/ecc/13.png)
+
+
+5,n为素数
+
+6, h≤4
+
+#### Demo
+这是参考网上的资料实现的简易ECC加解密Demo：
+
+```Python
+# -*- coding:utf-8 -*-
+
+def get_inverse(value, p):
+    """
+    求逆元
+    :param value: 待求逆元的值
+    :param p: 模数
+    """
+    for i in range(1, p):
+        if (i * value) % p == 1:
+            return i
+    return -1
+
+def get_gcd(value1, value2):
+    """
+    辗转相除法求最大公约数
+    :param value1:
+    :param value2:
+    """
+    if value2 == 0:
+        return value1
+    else:
+        return get_gcd(value2, value1 % value2)
+
+def get_PaddQ(x1, y1, x2, y2, a, p):
+    """
+    计算P+Q
+    :param x1: P点横坐标
+    :param y1: P点纵坐标
+    :param x2: Q点横坐标
+    :param y2: Q点纵坐标
+    :param a: 曲线参数
+    :param p: 曲线模数
+    """
+    flag = 1 # 定义符号位(+/-)
+
+    # 如果P=Q，斜率k=(3x^2+a)/2y mod p
+    if x1 == x2 and y1 == y2:
+        member = 3 * (x1 ** 2) + a # 分子
+        denominator = 2 * y1 # 分母
+
+    # 如果P≠Q， 斜率k=(y2-y1)/(x2-x1) mod p
+    else:
+        member = y2 - y1
+        denominator = x2 - x1
+
+        if member * denominator < 0:
+            flag = 0 # 表示负数
+            member = abs(member)
+            denominator = abs(denominator)
+
+    # 化简分子分母
+    gcd = get_gcd(member, denominator) # 最大公约数
+    member = member // gcd
+    denominator = denominator // gcd
+    # 求分母的逆元
+    inverse_deno = get_inverse(denominator, p)
+    # 求斜率
+    k = (member * inverse_deno)
+    if flag == 0:
+        k = -k
+    k = k % p
+
+    # 计算P+Q=(x3,y3)
+    x3 = (k ** 2 - x1 - x2) % p
+    y3 = (k * (x1-x3) -y1) % p
+
+    return x3, y3
+
+def get_order(x0, y0, a, b, p):
+    """
+    计算椭圆曲线的阶
+    """
+    x1 = x0 # -P的横坐标
+    y1 = (-1 * y0) % p # -P的纵坐标
+    temp_x = x0
+    temp_y = y0
+    n = 1
+    while True:
+        n += 1
+        # 累加P,得到n*P=0∞
+        xp, yp = get_PaddQ(temp_x, temp_y, x0, y0, a, p)
+        # 如果(xp,yp)==-P，即(xp,yp)+P=0∞，此时n+1为阶数
+        if xp == x1 and yp == y1:
+            return n+1
+        temp_x = xp
+        temp_y = yp
+
+def get_dot(x0, a, b, p):
+    """
+    计算P和-P
+    """
+    y0 = -1
+    for i in range(p):
+        # 满足适合加密的椭圆曲线条件，Ep(a,b)，p为质数，x,y∈[0,p-1]
+        if i**2 % p == (x0**3 + a*x0 + b) % p:
+            y0 = i
+            break
+    # 如果找不到合适的y0返回False
+    if y0 == -1:
+        return False
+    # 计算-y
+    x1 = x0
+    y1 = (-1*y0) % p
+    return x0, y0, x1, y1
+
+def get_graph(a, b, p):
+    """
+    画出椭圆曲线散点图
+    """
+    xy = []
+    # 初始化二维数组
+    for i in range(p):
+        xy.append(['-' for i in range(p)])
+
+    for i in range(p):
+        value = get_dot(i, a, b, p)
+        if (value != False):
+            x0,y0,x1,y1 = value
+            xy[x0][y0] = 1
+            xy[x1][y1] = 1
+
+    print('椭圆曲线散点图：')
+    for i in range(p):
+        temp = p - 1 -i
+        if temp >= 10:
+            print(temp, end='')
+        else:
+            print(temp, end='')
+
+        # 输出具体坐标值
+        for j in range(p):
+            print(xy[j][temp], end='')
+        print()
+
+    print(' ', end='')
+    for i in range(p):
+        if i >= 10:
+            print(i, end='')
+        else:
+            print(i, end='')
+
+    print()
+
+def get_nG(xG, yG, priv_key, a, p):
+    """
+    计算nG
+    """
+    temp_x = xG
+    temp_y = yG
+    while priv_key != 1:
+        temp_x, temp_y = get_PaddQ(temp_x, temp_y, xG, yG, a, p)
+        priv_key -= 1
+    return temp_x, temp_y
+
+def get_KEY():
+    """
+    生成公钥私钥
+    """
+    # 选择曲线方程
+    while True:
+        a = int(input('输入椭圆曲线参数a（a>0）的值：'))
+        b = int(input('输入椭圆曲线参数b（b>0）的值：'))
+        p = int(input('输入椭圆曲线参数p（p为素数）的值：'))
+
+        # 满足曲线判别式
+        if (4*(a**3)+27*(b**2))%p == 0:
+            print('输入的参数有误，请重新输入！\n')
+        else:
+            break
+
+    # 输出曲线散点图
+    get_graph(a, b, p)
+
+    # 选择基点G
+    print('在上图坐标系中选择基点G的坐标')
+    xG = int(input('横坐标xG：'))
+    yG = int(input('纵坐标yG：'))
+
+    # 获取曲线的阶
+    n = get_order(xG, yG, a, b, p)
+
+    # 生成私钥key，且key<n
+    priv_key = int(input('输入私钥key(<%d)：'%n))
+    #生成公钥KEY
+    xK, yK = get_nG(xG, yG, priv_key, a, p)
+    return xK, yK, priv_key, a, b, p, n, xG, yG
+
+def encrypt(xG, yG, xK, yK,priv_key, a, p, n):
+    """
+    加密
+    """
+    k = int(input('输入一个整数k(<%d)用于计算kG和kQ：' % n))
+    kGx, kGy = get_nG(xG, yG, priv_key, a, p) # kG
+    kQx, kQy = get_nG(xK, yK, priv_key, a, p) # kQ
+    plain = input('输入需要加密的字符串：')
+    plain = plain.strip()
+    c = []
+    print('密文为：', end='')
+    for char in plain:
+        intchar = ord(char)
+        cipher = intchar * kQx
+        c.append([kGx, kGy, cipher])
+        print('(%d,%d),%d' % (kGx, kGy, cipher), end=' ')
+
+    print()
+    return c
+
+def decrypt(c, priv_key, a, p):
+    """
+    解密
+    """
+    for charArr in c:
+        kQx, kQy = get_nG(charArr[0], charArr[1], priv_key, a, p)
+        print(chr(charArr[2] // kQx), end='')
+    print()
+
+
+if __name__ == '__main__':
+    xK, yK, priv_key, a, b, p, n, xG, yG = get_KEY()
+    c = encrypt(xG, yG, xK, yK, priv_key, a, p, n)
+    decrypt(c, priv_key, a, p)
+```
+
+```
+注：加密函数中，计算密文是通过明文字符的ASCII码乘点kQ的x坐标得到，即incharkQx；而一些加密中是将明文转换为大整数再转换为曲线上的点M(x,y)，密文为(C1=kG, C2=(M+kQ))，解密M=C1-priv_keyC2=M+kQ-priv_keykG=M+kpriv_keyG-priv_keykG
+```
+
+## 总结
+本文初步介绍了ECC算法的基本原理和实现步骤，另外，椭圆曲线还应用于密钥交换ECDH、数字签名ECDSA等。一些区块链项目中使用的加密算法也是椭圆曲线，如比特币中的数字签名算法Secp256k1。
+
+#### 参考文章
+https://www.pediy.com/kssd/pediy06/pediy6014.htm
+
+https://blog.dyboy.cn/websecurity/121.html
+
+https://github.com/amintos/PyECC/tree/master/ecc
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

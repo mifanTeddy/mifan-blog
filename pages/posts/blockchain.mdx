@@ -1,0 +1,129 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: '计算思维与区块链',
+  date: '2018-01-01 16:11:31',
+  description: '',
+  image: 'https://wlimg.oss-cn-beijing.aliyuncs.com/img/bc/1.jpeg!l',
+}
+
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/bc/1.jpeg!l) 
+
+### 第一代计算思维
+
+程序是程序、数据是数据 ![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/bc/1.png!l)
+
+### 第二代计算思维
+
+程序是数据 互联网传递信息 网页、邮件、在线视频
+
+### 第三代计算思维 ——— 区块链2.0
+
+数据是程序 通过网络传递价值 货币、债券、所有权、知识产权、创作物 数据 == 资产 转移唯一 程序 ——— 合约
+
+区块链
+---
+
+应用层：可编程货币 可编程金融 可编程社会 数据层：公共账本 共识算法 密码学 网络层：P2P网络 TCP/IP
+
+### 技术基础
+
+#### 密码学基础
+
+非对称签名 数字签名算法 ——— 交易的合约 椭圆曲线数字签名算法
+
+#### 分布式账本
+
+哈希算法 ——— 每条记录的完整性 Merkle tree ——— 记录间的完整性 ![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/bc/3.png) ![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/bc/4.png) UTXO POW（工作量证明）
+
+#### 分布式共识
+
+##### 一致性协议:
+
+        所以N个节点都认同一个结果
+        该结果必须由N个节点提出
+        决议过程在一定时间内结束
+        Paxos
+        Raft         https://raft.github.io/
+        ZAB
+        现实问题：消息传递异步无序、节点宕机、节点宕机恢复、网络分区
+        无法解决：拜占庭错误、女巫攻击
+    
+
+##### 拜占庭容错协议
+
+    网络中存在欺诈节点 ——— 篡改信息
+    N个节点  可能出现拜占庭错误的节点f个
+    N > 3f + 1
+    一致性协议：按顺序执行
+    检查点协议：检查日志，纠正节点状态
+    视图更换协议：主节点出问题，从节点替换
+    Derived PBFT
+    RPBFT
+    SPBFT
+    无法解决：女巫攻击
+    
+
+##### 基于博弈的协议
+
+    假设节点背后的人都是经纪人
+    POW
+    POS
+    DPOS
+    
+
+##### 共识协议的评估
+
+    一致性：私有链
+    拜占庭协议：联盟链、许可链
+    基于博弈的协议：公有链、可能需要代币（token）
+    
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/bc/5.png)
+
+#### 侧链
+
+锲入式侧链技术
+
+#### 闪电网络
+
+    多方签名
+    序列校验
+    交易到期可撤销合约（RSMC）
+    解决了双向通道中交易仲裁的问题
+    -----
+    锁定时间校验
+    哈希谜语
+    哈希时间锁定合约（HTLC）
+    解决了跨通道的时间过期问题
+    
+
+#### 零知识证明
+
+    保护转账记录的隐私
+    隐私交易密码学
+    
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/bc/6.png)
+
+#### 智能合约
+
+去中心化合约 ![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/bc/7.png)
+
+    技术：
+    1，沙盒安全
+    2，停机问题
+    3，集成互通
+    4，测试重用
+    现实：
+    1，法律规范
+    2，外部采信
+    3，执行验证
+    
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/bc/8.png)
+
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

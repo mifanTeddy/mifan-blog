@@ -1,0 +1,13 @@
+import Layout from 'lib/components/layout'
+import { Button } from '@zeit-ui/react'
+
+export const meta = {
+  title: '旧版',
+  date: '',
+  description: '',
+}
+
+或许你想看看[另一个样子的博客](https://www.xingwenlong.com)
+
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

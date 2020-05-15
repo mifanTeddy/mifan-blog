@@ -1,0 +1,43 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'mysql简单调优',
+  date: '2015-09-21 17:34:00',
+  description: '',
+  image: '',
+}
+
+对我自己的测试mysql进行了些简单的调优 不同配置的服务器，不同业务的数据库 调优方案自然不同 下面只是举例几个可调参数 仅供参考
+
+max_connections
+---------------
+
+show variables like ‘max\_connections’ 最大连接数 show  status like ‘max\_used\_connections’响应的连接数 max\_used\_connections / max\_connections * 100% （理想值≈ 85%） 如果max\_used\_connections跟max\_connections相同 那么就是max\_connections设置过低或者超过服务器负载上限了，低于10%则设置过大。 ![img1](https://wlimg.oss-cn-beijing.aliyuncs.com/img/img1.png)
+
+back_log
+--------
+
+MySQL能暂存的连接数量。 默认数值是50，可调优为128，对于Linux系统设置范围为小于512的整数。 ![img2](https://wlimg.oss-cn-beijing.aliyuncs.com/img/img2.png)
+
+interactive_timeout
+-------------------
+
+一个交互连接在被服务器在关闭前等待行动的秒数。 默认数值是28800，可调优为7200。 ![img3](https://wlimg.oss-cn-beijing.aliyuncs.com/img/img3.png)
+
+key\_buffer\_size
+-----------------
+
+key\_buffer\_size指定索引缓冲区的大小，它决定索引处理的速度，尤其是索引读的速度。 默认配置数值是8388600(8M)，主机有4GB内存，可以调优值为268435456(256MB)。 ![img4](https://wlimg.oss-cn-beijing.aliyuncs.com/img/img4.png)
+
+sort\_buffer\_size
+------------------
+
+每个需要进行排序的线程分配该大小的一个缓冲区。增加这值加速ORDER BY或GROUP BY操作。 默认数值是2097144(2M)，可改为16777208 (16M)。 ![img5](https://wlimg.oss-cn-beijing.aliyuncs.com/img/img5.png)
+
+thread\_cache\_size
+-------------------
+
+可以复用的线程的数量。如果有，新的线程从缓存中取得，当断开连接的时候如果有空间，客户的线程置在缓存中。   1G  ---> 8      2G  ---> 16      3G  ---> 32     3G  ---> 64 ![img6](https://wlimg.oss-cn-beijing.aliyuncs.com/img/img6.png)
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

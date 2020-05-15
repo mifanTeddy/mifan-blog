@@ -1,0 +1,23 @@
+import Layout from 'lib/components/layout'
+import { Button } from '@zeit-ui/react'
+
+export const meta = {
+  title: '关于我',
+  date: '',
+  description: '',
+}
+
+你好，我是米饭。目前在做着区块链和大数据架构的工作。
+
+喜欢golang python 和scala。
+
+曾北漂5年，现在回归故乡。
+
+喜欢拳击，喜欢摄影。
+
+在工作之余，给在校生或毕业生们提供免费的就业指导和职业规划。
+
+同时，在非工作时间，接受有偿的区块链架构咨询服务。
+
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

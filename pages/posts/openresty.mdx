@@ -1,0 +1,176 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'OpenResty学习笔记',
+  date: '2015-10-12 15:37:09',
+  description: '',
+  image: '',
+}
+
+为了应对网站的高并发,可以采用的高性能服务器方案。 Nginx c module：性能很高，但是开发成本太高，适用于超大并发（亿级别） LuaJIT OpenResty ： Nginx + LuaJIT
+
+
+ngx_lua 工作原理：
+=============
+
+![图](https://wlimg.oss-cn-beijing.aliyuncs.com/img/openresty.jpg) 简单的说是讲lua代码嵌入到nginx的配置文件中 通过lua\_code\_cache on | off 可以开启和关闭代码缓存 开启后性能更高，所以生产环境一般选择开启 测试调试的时候 可以关闭 更方便的测试，开发阶段可以考虑关闭 ngx lua API 尽量调用ngx的api而不要调用lua自己的api，ngx的api是非阻塞的 lua自己的api是阻塞的 eg1：
+
+    local json = require "cjson"
+    
+    ngx.req.read_body()
+    local args = ngx.req.get_post_args()
+    
+    if not args or not args.info then
+        ngx.exit(ngx.HTTP_BAD_REQUEST)
+    end
+    
+    local clint_ip = ngx.var.remote_addr
+    local user_agent = ngx.req.get_headers()['user_agent'] or ''
+    local info = ngx.decode_base64(args.info)
+    
+    local response = {}
+    response.info = info
+    response.ip = clint_ip
+    response.user_agent = user_agent
+    
+    ngx.say(json.encode(response))
+    
+    
+
+连接数据库：
+------
+
+简单的demo：看上去不是异步的 其实是完全的异步非阻塞
+
+    local mysql = require "OpenResty.mysql"
+    local db, err = mysql:new()
+    if not db then
+        ngx.say("failed to instantate mysql:", err)
+        return
+    end
+    
+    db:set_timeout(1000)   -- 1 sec
+    
+    local ok, err, errno, sqlstate = db:connect{
+        host = "127.0.0.1",
+        port = 3306,
+        database = "ngx_test",
+        user = "ngx_test",
+        password = "ngx_test",
+        max_packet_size = 1024 * 1024
+    }
+    
+    if not ok then
+        ngx.say("failed to connect:", err, ": ", errno, " ", sqlstate)
+        return
+    end
+    
+    ngx.say("connected to mysql.")
+    
+    
+    res, err, errno, sqlstate =
+        db:query("create table cats "
+            .. "(id serial primary key, "
+            .. "name varchar(5))" )
+    
+    if not res then
+        ngx.say("bad result: ", err, ": ", errno, ": ", sqlstate, ".")
+        return
+    end
+    
+    ngx.say("table cats created.")
+    
+    res, err, errno, sqlstate =
+        db:query("insert into cats (name) "
+            .. "values (\'Bob\'),(\'\'),(null)")
+    
+    if not res then
+        ngx.say("bad result: ", err, ": ", errno, ": ", sqlstate, ".")
+        return
+    end
+    
+
+OpenResty缓存：
+------------
+
+### shared_dict
+
+在nginx.conf里增加
+
+    lua_shared_dict   my_cache 128m;  # my_cache名字 128m内存空间
+    
+
+demo:
+
+    function get_from_cache( key )
+        local my_cache = ngx.shared.my_cache
+        local value = my_cache:get(key)
+        return value
+    end
+    
+
+预设了内存的大小 共享的内存 多个worker使用同一个shared\_dict 同一份数据共享使用 有get set delete add replace incr get\_keys get_stale操作 弊端：锁竞争
+
+### lua-resty-lrucache:
+
+预设了key的个数，每个worker单独占用，没有锁竞争，但是内存占用大。 lrucache 只有get set delete三个操作 demo：
+
+    local lrucache = require "resty.lrucache"
+    
+    local c = lrucache.new(200)
+    if not c then
+        return error("failed to create the cache: " .. (err or "unkonwn"))
+    end
+    
+    c:set("dog", 32)
+    ngx.say("dog: ", c:get("dog"))
+    
+
+### 缓存失效风暴:
+
+使用lua-resty-lock库解决（对sql加锁）（已经完成wait for lock）
+
+FFI：
+----
+
+为了提高性能 用来调用C函数和使用C的数据结构 demo：
+
+    local ffi = require("ffi")
+    ffi.cdef[[
+        int.printf(const char *fmt, ...);
+    ]]
+    ffi.C.printf("Hello %s!", "world\n")
+    
+
+第三方模块：
+------
+
+下好第三方模块，放在resty目录下 require引用 子查询： demo：
+
+    location /lua {
+        content_by_lua '
+            local res = ngx.location.capture
+            ("/some_other_location")
+            if res.status == 200 then
+                ngx.print(res.body)
+            end';
+    }
+    
+
+C级别的调用 性能高 capture_multi 并发的发起子查询：
+
+    res1, res2, res3 = ngx.location.capture_multi{
+        {"/foo", {args = "a=3&b=4"}},
+        {"/bar"},
+        {"/bar",{ method = ngx.HTTP_POST,body = "hello"}},
+    }
+    
+
+执行阶段：
+=====
+
+在不同的阶段处理不同的行为 \[Nginx和lua执行顺序\]
+
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

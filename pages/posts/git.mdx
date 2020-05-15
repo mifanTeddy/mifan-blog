@@ -1,0 +1,171 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'Git简明教程',
+  date: '2015-11-20 14:21:27',
+  description: '',
+  image: 'https://wlimg.oss-cn-beijing.aliyuncs.com/14.jpg!l',
+}
+
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/14.jpg!l)
+
+Git是目前世界上最先进的分布式版本控制系统之一 版本控制系统分类：分布式（git BitKeeper） 集中式（CVS SVN） Linux之父Linus花了两周时间自己用C写了一个分布式版本控制系统，这就是Git ![分布式版本控制系统](https://wlimg.oss-cn-beijing.aliyuncs.com/img/git/1.jpg)
+
+本地使用git
+-------
+
+    git init                               #创建版本库
+    touch hello.txt
+    git add hello.txt                      #将文件添加到版本库
+    git commit -m 'Add a hello file'       #提交文件到版本库
+    
+
+关于为什么会有add 和 commit两个操作 是这样的 ![工作区和暂存区](https://wlimg.oss-cn-beijing.aliyuncs.com/img/git/2.jpg) commit操作只会提交缓存区的修改 第一次修改a -> git add -> 第二次修改b -> git commit -> a被提交 b不会
+
+### 版本管理
+
+查看改动
+
+    git status
+    git diff
+    
+
+关于git status 它会判断两个地方的改动 一个是本地 一个是暂存区 如下所示
+
+    mifandeMacBook:gitclass mifan$ touch a.txt
+    mifandeMacBook:gitclass mifan$ touch b.txt
+    mifandeMacBook:gitclass mifan$ git add a.txt
+    mifandeMacBook:gitclass mifan$ git status
+    On branch master
+    Changes to be committed:
+      (use "git reset HEAD <file>..." to unstage)
+    
+        new file:   a.txt
+    
+    Changes not staged for commit:
+      (use "git add <file>..." to update what will be committed)
+      (use "git checkout -- <file>..." to discard changes in working directory)
+    
+        modified:   1.txt
+    
+    Untracked files:
+      (use "git add <file>..." to include in what will be committed)
+    
+        b.txt
+    
+
+git diff 实际上是比较的本地和add之前的文件
+
+    mifandeMacBook:gitclass mifan$git diff
+    diff --git a/b.txt b/b.txt
+    index e69de29..f761ec1 100644
+    --- a/b.txt
+    +++ b/b.txt
+    @@ -0,0 +1 @@
+    +bbb
+    mifandeMacBook:gitclass mifan$git add b.txt
+    mifandeMacBook:gitclass mifan$git diff
+    mifandeMacBook:gitclass mifan$
+    
+
+### 版本回退
+
+    git log
+    git reflog
+    
+
+查看我们的版本改动日志和命令日志
+
+    git reset --hard HEAD^
+    git reset --hard HEAD^xxxxx
+    git checkout --filename
+    
+
+分别是 回到上一个版本 到指定的版本（配合log和reflog命令使用 XXX可以只写版本号的前几位进行匹配） git checkout --filename可以用来拿到工作区的文件（注意 是--filename 不是filename）
+
+### 撤销修改
+
+简单的说 git checkout --filename 用来直接丢弃工作区的修改（未添加到缓存区）（不可逆） git reset HEAD filename 用来把版本库的同步进缓存区 然后进行上一步 git reset --hard HEAD^ 用来回滚已经提交到版本库的修改 删除文件
+
+    git rm filename
+    git commit -m 'delete xxx file'
+    
+
+使用Github
+--------
+
+第1步：创建SSH Key。在用户主目录下，看看有没有.ssh目录，如果有，再看看这个目录下有没有id\_rsa和id\_rsa.pub这两个文件，如果已经有了，可直接跳到下一步。如果没有，打开Shell（Windows下打开Git Bash），创建SSH Key：
+
+    $ ssh-keygen -t rsa -C "youremail@example.com"
+    
+
+你需要把邮件地址换成你自己的邮件地址，然后一路回车，使用默认值即可，由于这个Key也不是用于军事目的，所以也无需设置密码。 如果一切顺利的话，可以在用户主目录里找到.ssh目录，里面有id\_rsa和id\_rsa.pub两个文件，这两个就是SSH Key的秘钥对，id\_rsa是私钥，不能泄露出去，id\_rsa.pub是公钥，可以放心地告诉任何人。 第2步：登陆GitHub，打开“Account settings”，“SSH Keys”页面： 然后，点“Add SSH Key”，填上任意Title，在Key文本框里粘贴id_rsa.pub文件的内容：
+
+    $ git remote add origin git@github.com:Your-github-name/learngit.git
+    
+
+origin这个名字指的是远程库 自己指定
+
+    git push -u origin master
+    
+
+推送主分支的内容到远程库
+
+    git clone
+    
+
+这个命令应该大家使用的都比较多 经常下载代码或者什么的都使用到
+
+    git remote  # -v 更详细信息
+    git push origin master/dev/xxx
+    git pull
+    
+
+从本地推送分支，使用git push origin branch-name，如果推送失败，先用git pull抓取远程的新提交； 在本地创建和远程分支对应的分支，使用git checkout -b branch-name origin/branch-name，本地和远程分支的名称最好一致； 建立本地分支和远程分支的关联，使用git branch --set-upstream branch-name origin/branch-name；
+
+分支管理
+----
+
+    git checkout -b dev  # 相当于  git branch dev (创建分支) && git checkout dev （切换分支）
+    git branch           # 查看现在的分支
+    git merge dev        # 合并dev分支到当前分支
+    gir merge --no-ff -m "merge with no-ff"  # 合并分支 不丢失分支信息 并添加描述
+    git branch -d dev    # 删除分支 -D 强制删除
+    
+
+冲突解决 当 1分支 和 2分支 对同一个文件进行了修改 提交之后 分支直接回产生冲突 解决冲突后 再次提交 版本号增加
+
+### 分支管理
+
+分支管理建议是这样 ![3](https://wlimg.oss-cn-beijing.aliyuncs.com/img/git/3.png) master相当于生产环境分支 只有稳定的代码放在上面 dev 相当于测试环境 每个人拥有自己的分支 供自己使用开发 bug分支
+
+    git stash           #
+    git stash list
+    git stash pop
+    
+
+修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除； 当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场。
+
+tag标签
+-----
+
+    git checkout master     # 到需要打tag的分支
+    git tag v1.0            # 打tag
+    git tag                 # 查看tag
+    git tag v0.9 xxxxxx     # 对指定的版本打tag
+    git show v1.0           # 查看tag信息
+    git tag -d v0.9         # 删除tag信息
+    
+
+比如上线版本 稳定版本 里程碑之类的版本 应该打个tag
+
+    git push origin v1.0
+    git push origin --tags
+    
+
+推送tag到远程库
+
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

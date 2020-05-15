@@ -1,0 +1,53 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'Mysql事务隔离级别和锁',
+  date: '2015-09-24 17:11:00',
+  description: '',
+  image: '',
+}
+
+
+
+事务隔离
+====
+
+SERIALIZABLE
+------------
+
+序列化 按顺序执行，上一个事务没有处理完，下一个事务不进行处理 事务1没有结束的时候 事务2查询不到数据,进行不了修改
+
+REPEATABLE READ
+---------------
+
+可重复读 事务1进行的时候，事务2查询的数据重复不变，除非事务1对表有插入提交之后，在事务2中用到了这些修改，会出现事务2查询的数据不一致，称为幻读
+
+READ COMMITIED
+--------------
+
+提交读 只要是修改被提交的改动，就可以体现出来。
+
+READ UNCOMMITIED
+----------------
+
+未提交读 没有提交的修改，也可以查看到 有可能出现脏读（多个事务同时对同一数据操作，某数据可能执行类似rollback操作，出现脏读） SERIALIZABLE，安全性最高，性能最低 READ UNCOMMITIED 安全性最低，性能最高 mysql中 默认的隔离级别是REPEATABLE READ Oracle中 默认的隔离级别是READ COMMITIED 查看全局隔离级别 select @@CLOBAL.tx_isolation; 实例的 @@session 修改隔离级别 set session transaction isolation level serializable;
+
+锁机制
+===
+
+并发访问数据库的同一资源时，数据库的锁就会起作用，来保证数据的一致性 Mysql中锁从类型分读锁和写锁 读锁(共享锁)：由读表操作加上的锁，加锁后其他用户只能获取该表或行的共享锁，不能获取排它锁，也就是说只能读不能写 写锁(排他锁)：由写表操作加上的锁，加锁后其他用户不能获取该表或行的任何锁。 Mysql中的锁范围 大致分为三种
+
+### 表级锁
+
+写入数据时，锁整个表，开销小，加锁和释放快，不会死锁。 但是容易发生锁冲突，所以并发小。
+
+### 行级锁
+
+锁行，开销大，加锁和释放锁慢，会死锁，但是并发高
+
+### 页级锁
+
+介于两者之间，也会死锁。 不同存储引擎中 MyIsam使用表锁，InnoDB使用行锁。 同时，mysql本身的不同操作，也使用不同的锁
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

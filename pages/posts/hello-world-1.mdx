@@ -1,0 +1,28 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+      title: 'Hello World',
+        date: '2015-09-17 14:22:39',
+          description: '',
+            image: 'https://wlimg.oss-cn-beijing.aliyuncs.com/12.jpg!l',
+}
+
+欢迎来到米饭的博客~
+
+博客内容
+----
+
+### 技术方面
+
+学习过程中的记录
+
+    print("Hello World");
+    
+
+### 生活方面
+
+    Hello Food~
+
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

@@ -1,0 +1,118 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'BA计算器使用说明',
+  date: '2016-04-23 17:08:23',
+  description: '',
+  image: 'https://wlimg.oss-cn-beijing.aliyuncs.com/12.jpg!l',
+}
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/12.jpg!l)
+
+MEM Functions
+=============
+
+    [STO][0-9]寄存器存储
+    eg [555][STO][0-9]
+    
+    [RCL][0-9]读取寄存器数据
+    
+    [MEM] 查看寄存器数据
+    进入MEM后 [CLR WORK]清空寄存器
+    
+
+Date Functions
+==============
+
+    [DATE] ([2ND][1])
+    月－日－年   eg 10-01-2014 2014年10月1日
+    DT1   DT2
+    [CPT] computeenter  计算结果
+    DBD 结果
+    ACT / 360   一年是真实天 或每月30天
+    
+
+Nominal and Effective Interest Rates(BEY and EAY)
+=================================================
+
+    [ICONV]
+    NOM       名义利率
+    EFT         实际利率
+    C/Y         周期
+    
+
+Time Value of Money
+===================
+
+    N
+    I/Y
+    PV
+    FV
+    PMT
+    
+    PMT每期不同的话
+    [CF]  每期现金流
+    CF0   初始值
+    C01   第一个
+    F01   出现次数
+    C02   第二个
+    F02   出现次数
+    。。。
+    [NPV]
+    I     利率
+    NFV   现值
+    
+
+Capital Budgeting
+=================
+
+### NPV
+
+![NPV](https://wlimg.oss-cn-beijing.aliyuncs.com/img/BA/1.jpg)
+
+### IRR
+
+![IRR](https://wlimg.oss-cn-beijing.aliyuncs.com/img/BA/2.jpg)
+
+    [CF] 输入完成后
+    [IRR] [CPT] 得出IRR
+    
+
+Breakeven Quantity of Sales
+===========================
+
+![BQS](https://wlimg.oss-cn-beijing.aliyuncs.com/img/BA/3.jpg) ![BQS](https://wlimg.oss-cn-beijing.aliyuncs.com/img/BA/4.jpg)
+
+Statistical Concepts and Market Returns
+=======================================
+
+    [DATA]   输入数据
+    [STAT]   输出结果
+    
+
+Sample Variance (s2) and Sample Standard Deviation (s)
+======================================================
+
+    [STAT]  1-V
+    
+
+Linear Regression Covariance/Correlation
+========================================
+
+    [STAT] LIN
+    
+
+Probability Concepts
+====================
+
+    [x!]
+    
+
+Depreciation
+============
+
+    [DEPR]
+
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

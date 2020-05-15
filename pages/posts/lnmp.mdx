@@ -1,0 +1,839 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'LNMP安装脚本',
+  date: '2015-09-22 10:34:09',
+  description: '',
+  image: '',
+}
+
+
+实习的时候写过的LNMP安装脚本 符合当时的生产环境要求 脚本可拓展性还可以 但是还有许多可以改进的地方 比如把需要安装的版本号单独拿出来 增加拓展性 
+
+
+```bash 
+
+#!/bin/bash
+#注意nginx配置文件可能会因为开发人员的需求发生改变，要使用现在线上的配置文件
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+# Check if user is root
+ [ $(id -u) !=  ]; 
+     "Error: You must be root to run this script, please use root to install lnmp"
+
+clear
+ "========================================================================="
+ "LNMP V0.3 for CentOS/RadHat Linux Server, Written by 邢文龙"
+ "========================================================================="
+ "A tool to auto-compile & install Nginx+MySQL+PHP+PHP-memcached扩展+PHP-redis扩展+solr扩展 on Linux "
+
+"For more information please contact 邢文龙 email:xingwenlong@hotyq.com"
+ "========================================================================="
+cur_dir=$()
+
+#set mysql root password
+         "==========================="
+
+
+        mysqlrootpwd="root"
+         "Please input the root password of mysql:"
+         -p "(Default password: root):" mysqlrootpwd
+         [ "$mysqlrootpwd" =  ]; 
+                mysqlrootpwd="root"
+
+"==========================="
+         "MySQL root password:$mysqlrootpwd"
+         "==========================="
+
+#do you want to install the InnoDB Storage Engine?
+ "==========================="
+
+installinnodb=
+         "Do you want to install the InnoDB Storage Engine?"
+         -p "(Default no,if you want please input: y ,if not please press the enter button):" installinnodb
+
+"$installinnodb" 
+        y|Y|Yes|YES|yes|yES|yEs|YeS|yeS)
+         "You will install the InnoDB Storage Engine"
+        installinnodb=
+
+n|N|No|NO|no|nO)
+         "You will NOT install the InnoDB Storage Engine!"
+        installinnodb=
+
+
+         "INPUT error,The InnoDB Storage Engine will NOT install!"
+        installinnodb=
+
+
+#which PHP Version do you want to install?
+ "==========================="
+         "You will install PHP 5.3.28"
+        isinstallphp53=
+
+#which MySQL Version do you want to install?
+ "==========================="
+         "You will install MySQL 5.5.37"
+        isinstallmysql55=
+
+get_char()
+
+SAVEDSTTY=`stty -g`
+        stty -echo
+        stty cbreak
+        dd =/dev/tty bs= count= > /dev/null
+        stty -raw
+
+stty $SAVEDSTTY
+
+
+         "Press any key to start...or Press Ctrl+c to cancel"
+        char=`get_char`
+
+function InitInstall()
+
+cat /etc/issue
+        uname 
+        MemTotal=`free -m | grep Mem | awk '{print  $2}'`
+          "\n Memory is: ${MemTotal} MB "
+        #Set timezone
+        rm -rf /etc/localtime
+        ln  /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+yum install -y ntp
+        ntpdate -u pool.ntp.org
+
+
+        rpm -qa|grep httpd
+        rpm  httpd
+        rpm -qa|grep mysql
+        rpm  mysql
+        rpm -qa|grep php
+        rpm  php
+
+yum -y remove httpd*
+        yum -y remove php*
+        yum -y remove mysql-server mysql mysql-libs
+        yum -y remove php-mysql
+
+yum -y install yum-fastestmirror
+        yum -y remove httpd
+        #yum -y update
+
+#Disable SeLinux
+         [  /etc/selinux/config ]; 
+             sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+
+
+        cp /etc/yum.conf /etc/yum.conf.lnmp
+        sed -i 's:exclude=.*:exclude=:g' /etc/yum.conf
+
+packages  patch make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel freetype freetype-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel bzip2 bzip2-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal nano fonts-chinese gettext gettext-devel ncurses-devel gmp-devel pspell-devel unzip libcap diffutils;
+         yum -y install $packages; 
+
+mv  /etc/yum.conf.lnmp /etc/yum.conf
+
+
+function CheckAndDownloadFiles()
+
+"============================check files=================================="
+         [  php-..tar.gz ]; 
+           "php-5.3.28.tar.gz [found]"
+
+"Error: php-5.3.28.tar.gz not found!!!download now......"
+          wget -c http://soft.vpser.net/web/php/php-..tar.gz
+
+
+ [  memcache-..tgz ]; 
+   "memcache-3.0.6.tgz [found]"
+
+"Error: memcache-3.0.6.tgz not found!!!download now......"
+  wget -c http://soft.vpser.net/web/memcache/memcache-..tgz
+
+
+ [  pcre-.tar.gz ]; 
+   "pcre-8.12.tar.gz [found]"
+
+"Error: pcre-8.12.tar.gz not found!!!download now......"
+  wget -c http://soft.vpser.net/web/pcre/pcre-.tar.gz
+
+
+ [  nginx-..tar.gz ]; 
+   "nginx-1.6.0.tar.gz [found]"
+
+"Error: nginx-1.6.0.tar.gz not found!!!download now......"
+  wget -c http://soft.vpser.net/web/nginx/nginx-..tar.gz
+
+
+ [  mysql-..tar.gz ]; 
+   "mysql-5.5.37.tar.gz [found]"
+
+"Error: mysql-5.5.37.tar.gz not found!!!download now......"
+  wget -c http://soft.vpser.net/datebase/mysql/mysql-..tar.gz
+
+
+ [  libiconv-.tar.gz ]; 
+   "libiconv-1.14.tar.gz [found]"
+
+"Error: libiconv-1.14.tar.gz not found!!!download now......"
+  wget -c http://soft.vpser.net/web/libiconv/libiconv-.tar.gz
+
+
+ [  libmcrypt-..tar.gz ]; 
+   "libmcrypt-2.5.8.tar.gz [found]"
+
+"Error: libmcrypt-2.5.8.tar.gz not found!!!download now......"
+  wget -c  http://soft.vpser.net/web/libmcrypt/libmcrypt-..tar.gz
+
+
+ [  mhash-..tar.gz ]; 
+   "mhash-0.9.9.9.tar.gz [found]"
+
+"Error: mhash-0.9.9.9.tar.gz not found!!!download now......"
+  wget -c http://soft.vpser.net/web/mhash/mhash-..tar.gz
+
+
+ [  mcrypt-..tar.gz ]; 
+   "mcrypt-2.6.8.tar.gz [found]"
+
+"Error: mcrypt-2.6.8.tar.gz not found!!!download now......"
+  wget -c http://soft.vpser.net/web/mcrypt/mcrypt-..tar.gz
+
+
+ [  phpMyAdmin-lasest.tar.gz ]; 
+   "phpMyAdmin-lasest.tar.gz [found]"
+
+"Error: phpMyAdmin-lasest.tar.gz not found!!!download now......"
+  wget -c http://soft.vpser.net/datebase/phpmyadmin/phpMyAdmin-lasest.tar.gz
+
+
+ [  p.tar.gz ]; 
+   "p.tar.gz [found]"
+
+"Error: p.tar.gz not found!!!download now......"
+  wget -c http://soft.vpser.net/prober/p.tar.gz
+
+
+ [  autoconf-.tar.gz ]; 
+   "autoconf-2.13.tar.gz [found]"
+
+"Error: autoconf-2.13.tar.gz not found!!!download now......"
+  wget -c http://soft.vpser.net/lib/autoconf/autoconf-.tar.gz
+
+
+ [  mysql-openssl.patch ]; 
+   "mysql-openssl.patch [found]"
+
+"Error: mysql-openssl.patch not found!!!download now......"
+  wget -c http://soft.vpser.net/lnmp/ext/mysql-openssl.patch
+
+"============================check files=================================="
+
+function InstallDependsAndOpt()
+
+$cur_dir
+
+tar zxf autoconf-.tar.gz
+ autoconf-/
+./configure --prefix=/usr/local/autoconf-
+make && make install
+
+
+tar zxf libiconv-.tar.gz
+ libiconv-/
+./configure
+make && make install
+
+
+ $cur_dir
+tar zxf libmcrypt-..tar.gz
+ libmcrypt-./
+./configure
+make && make install
+/sbin/ldconfig
+ libltdl/
+./configure --enable-ltdl-install
+make && make install
+ ../../
+
+$cur_dir
+tar zxf mhash-..tar.gz
+ mhash-./
+./configure
+make && make install
+
+
+ln  /usr/local/lib/libmcrypt.la /usr/lib/libmcrypt.la
+ln  /usr/local/lib/libmcrypt.so /usr/lib/libmcrypt.so
+ln  /usr/local/lib/libmcrypt.so. /usr/lib/libmcrypt.so.
+ln  /usr/local/lib/libmcrypt.so.. /usr/lib/libmcrypt.so..
+ln  /usr/local/lib/libmhash.a /usr/lib/libmhash.a
+ln  /usr/local/lib/libmhash.la /usr/lib/libmhash.la
+ln  /usr/local/lib/libmhash.so /usr/lib/libmhash.so
+ln  /usr/local/lib/libmhash.so. /usr/lib/libmhash.so.
+ln  /usr/local/lib/libmhash.so.. /usr/lib/libmhash.so..
+
+$cur_dir
+tar zxf mcrypt-..tar.gz
+ mcrypt-./
+./configure
+make && make install
+
+
+ [ `getconf WORD_BIT` =  ] && [ `getconf LONG_BIT` =  ] ; 
+        ln  /usr/lib64/libpng.* /usr/lib/
+        ln  /usr/lib64/libjpeg.* /usr/lib/
+
+
+ulimit -v unlimited
+
+[ ! `grep  "/lib"    '/etc/ld.so.conf'` ]; 
+         "/lib" >> /etc/ld.so.conf
+
+
+ [ ! `grep  '/usr/lib'    '/etc/ld.so.conf'` ]; 
+         "/usr/lib" >> /etc/ld.so.conf
+
+
+ [  "/usr/lib64" ] && [ ! `grep  '/usr/lib64'    '/etc/ld.so.conf'` ]; 
+         "/usr/lib64" >> /etc/ld.so.conf
+
+
+ [ ! `grep  '/usr/local/lib'    '/etc/ld.so.conf'` ]; 
+         "/usr/local/lib" >> /etc/ld.so.conf
+
+
+ldconfig
+
+cat >>/etc/security/limits.conf<<eof
+* soft nproc 65535
+* hard nproc 65535
+* soft nofile 65535
+* hard nofile 65535
+
+
+ "fs.file-max=65535" >> /etc/sysctl.conf
+
+
+function InstallMySQL55()
+
+"============================Install MySQL 5.5.26=================================="
+ $cur_dir
+
+rm  /etc/my.cnf
+tar zxf mysql-..tar.gz
+ mysql-./
+patch -p1 < $cur_dir/mysql-openssl.patch
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci -DWITH_READLINE= -DWITH_SSL=system -DWITH_ZLIB=system -DWITH_EMBEDDED_SERVER= -DENABLED_LOCAL_INFILE=
+make && make install
+
+groupadd mysql
+useradd  /sbin/nologin -M -g mysql mysql
+
+cp support-files/my-medium.cnf /etc/my.cnf
+sed '/skip-external-locking/i\datadir = /usr/local/mysql/var' -i /etc/my.cnf
+ [ $installinnodb =  ]; 
+sed -i 's:#innodb:innodb:g' /etc/my.cnf
+sed -i 's:/usr/local/mysql/data:/usr/local/mysql/var:g' /etc/my.cnf
+
+sed '/skip-external-locking/i\default-storage-engine=MyISAM\nloose-skip-innodb' -i /etc/my.cnf
+
+
+/usr/local/mysql/scripts/mysql_install_db --defaults-file=/etc/my.cnf --basedir=/usr/local/mysql --datadir=/usr/local/mysql/var --user=mysql
+chown -R mysql /usr/local/mysql/var
+chgrp -R mysql /usr/local/mysql/.
+cp support-files/mysql.server /etc/init.d/mysql
+chmod  /etc/init.d/mysql
+
+cat > /etc/ld.so.conf.d/mysql.conf<<EOF
+/usr/local/mysql/lib
+/usr/local/lib
+
+ldconfig
+
+ln  /usr/local/mysql/lib/mysql /usr/lib/mysql
+ln  /usr/local/mysql/include/mysql /usr/include/mysql
+ [  "/proc/vz" ];
+ulimit  unlimited
+
+/etc/init.d/mysql start
+
+ln  /usr/local/mysql/bin/mysql /usr/bin/mysql
+ln  /usr/local/mysql/bin/mysqldump /usr/bin/mysqldump
+ln  /usr/local/mysql/bin/myisamchk /usr/bin/myisamchk
+ln  /usr/local/mysql/bin/mysqld_safe /usr/bin/mysqld_safe
+
+/usr/local/mysql/bin/mysqladmin -u root password $mysqlrootpwd
+
+cat > /tmp/mysql_sec_script<<EOF
+use mysql;
+update user  password=password('$mysqlrootpwd') where user='root';
+delete from user where not (user='root') ;
+delete from user where user='root' and password=; 
+drop database ;
+DROP USER @;
+flush privileges;
+
+
+/usr/local/mysql/bin/mysql -u root -p$mysqlrootpwd -h localhost < /tmp/mysql_sec_script
+
+rm  /tmp/mysql_sec_script
+
+/etc/init.d/mysql restart
+/etc/init.d/mysql stop
+ "============================MySQL 5.5.26 install completed========================="
+
+
+function InstallPHP53()
+
+"============================Install PHP 5.3.28================================"
+ $cur_dir
+export PHP_AUTOCONF=/usr/local/autoconf-/bin/autoconf
+export PHP_AUTOHEADER=/usr/local/autoconf-/bin/autoheader
+tar zxf php-..tar.gz
+ php-./
+./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --enable-fpm --with-fpm-user=www --with-fpm-group=www --with-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-iconv-dir --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-magic-quotes --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --enable-mbregex --enable-mbstring --with-mcrypt --enable-ftp --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-gettext --disable-fileinfo
+
+make ZEND_EXTRA_LIBS='-liconv'
+make install
+
+rm  /usr/bin/php
+ln  /usr/local/php/bin/php /usr/bin/php
+ln  /usr/local/php/bin/phpize /usr/bin/phpize
+ln  /usr/local/php/sbin/php-fpm /usr/bin/php-fpm
+
+"Copy new php configure file."
+mkdir -p /usr/local/php/etc
+cp php.ini-production /usr/local/php/etc/php.ini
+
+$cur_dir
+# php extensions
+ "Modify php.ini......"
+sed -i 's/post_max_size = 8M/post_max_size = 50M/g' /usr/local/php/etc/php.ini
+sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 50M/g' /usr/local/php/etc/php.ini
+sed -i 's/;date.timezone =/date.timezone = PRC/g' /usr/local/php/etc/php.ini
+sed -i 's/short_open_tag = Off/short_open_tag = On/g' /usr/local/php/etc/php.ini
+sed -i 's/; cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g' /usr/local/php/etc/php.ini
+sed -i 's/; cgi.fix_pathinfo=0/cgi.fix_pathinfo=0/g' /usr/local/php/etc/php.ini
+sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g' /usr/local/php/etc/php.ini
+sed -i 's/max_execution_time = 30/max_execution_time = 300/g' /usr/local/php/etc/php.ini
+sed -i 's/register_long_arrays = On/;register_long_arrays = On/g' /usr/local/php/etc/php.ini
+sed -i 's/magic_quotes_gpc = On/;magic_quotes_gpc = On/g' /usr/local/php/etc/php.ini
+sed -i 's/disable_functions =.*/disable_functions = passthru,exec,system,chroot,scandir,chgrp,chown,shell_exec,proc_open,proc_get_status,ini_alter,ini_restore,dl,openlog,syslog,readlink,symlink,popepassthru,stream_socket_server/g' /usr/local/php/etc/php.ini
+
+"Install ZendGuardLoader for PHP 5.3"
+ [ `getconf WORD_BIT` =  ] && [ `getconf LONG_BIT` =  ] ; 
+        wget -c http://soft.vpser.net/web/zend/ZendGuardLoader-php--linux-glibc23-x86_64.tar.gz
+        tar zxf ZendGuardLoader-php--linux-glibc23-x86_64.tar.gz
+        mkdir -p /usr/local/zend/
+        cp ZendGuardLoader-php--linux-glibc23-x86_64/php-.x/ZendGuardLoader.so /usr/local/zend/
+
+wget -c http://soft.vpser.net/web/zend/ZendGuardLoader-php--linux-glibc23-i386.tar.gz
+        tar zxf ZendGuardLoader-php--linux-glibc23-i386.tar.gz
+        mkdir -p /usr/local/zend/
+        cp ZendGuardLoader-php--linux-glibc23-i386/php-.x/ZendGuardLoader.so /usr/local/zend/
+
+
+ "Write ZendGuardLoader to php.ini......"
+cat >>/usr/local/php/etc/php.ini<<EOF
+;eaccelerator
+
+;ionCube
+
+[Zend Optimizer] 
+zend_extension=/usr/local/zend/ZendGuardLoader.so
+zend_loader.enable=
+zend_loader.disable_licensing=
+zend_loader.obfuscation_level_support=
+zend_loader.license_path=
+
+
+ "Creating new php-fpm configure file......"
+cat >/usr/local/php/etc/php-fpm.conf<<EOF
+[global]
+pid = /usr/local/php/var/run/php-fpm.pid
+error_ = /usr/local/php/var//php-fpm.log
+_level = notice
+
+[www]
+listen = /tmp/php-cgi.sock
+listen.backlog = -
+listen.allowed_clients = 127.0.
+listen.owner = www
+listen.group = www
+listen.mode = 
+user = www
+group = www
+pm = dynamic
+pm.max_children = 
+pm.start_servers = 
+pm.min_spare_servers = 
+pm.max_spare_servers = 
+request_terminate_timeout = 
+request_slowlog_timeout = 
+slowlog = var//slow.log
+
+
+ "Copy php-fpm init.d file......"
+cp $cur_dir/php-./sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+chmod +x /etc/init.d/php-fpm
+
+cp $cur_dir/lnmp /root/lnmp
+chmod +x /root/lnmp
+sed -i 's:/usr/local/php/logs:/usr/local/php/var/run:g' /root/lnmp
+ "============================PHP 5.3.28 install completed======================"
+
+
+function InstallNginx()
+
+"============================Install Nginx================================="
+groupadd www
+useradd  /sbin/nologin -g www www
+ $cur_dir
+tar zxf pcre-.tar.gz
+ pcre-/
+./configure
+make && make install
+
+
+ldconfig
+
+tar zxf nginx-..tar.gz
+ nginx-./
+./configure --user=www --group=www --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-http_gzip_static_module --with-ipv6
+make && make install
+
+
+ln  /usr/local/nginx/sbin/nginx /usr/bin/nginx
+
+rm  /usr/local/nginx/conf/nginx.conf
+ $cur_dir
+cp conf/nginx.conf /usr/local/nginx/conf/nginx.conf
+cp conf/dabr.conf /usr/local/nginx/conf/dabr.conf
+cp conf/discuz.conf /usr/local/nginx/conf/discuz.conf
+cp conf/sablog.conf /usr/local/nginx/conf/sablog.conf
+cp conf/typecho.conf /usr/local/nginx/conf/typecho.conf
+cp conf/wordpress.conf /usr/local/nginx/conf/wordpress.conf
+cp conf/discuzx.conf /usr/local/nginx/conf/discuzx.conf
+cp conf/none.conf /usr/local/nginx/conf/none.conf
+cp conf/wp2.conf /usr/local/nginx/conf/wp2.conf
+cp conf/phpwind.conf /usr/local/nginx/conf/phpwind.conf
+cp conf/shopex.conf /usr/local/nginx/conf/shopex.conf
+cp conf/dedecms.conf /usr/local/nginx/conf/dedecms.conf
+cp conf/drupal.conf /usr/local/nginx/conf/drupal.conf
+cp conf/ecshop.conf /usr/local/nginx/conf/ecshop.conf
+cp conf/pathinfo.conf /usr/local/nginx/conf/pathinfo.conf
+
+$cur_dir
+cp vhost.sh /root/vhost.sh
+chmod +x /root/vhost.sh
+
+mkdir -p /home/wwwroot/default
+chmod +w /home/wwwroot/default
+mkdir -p /home/wwwlogs
+chmod  /home/wwwlogs
+
+chown -R www:www /home/wwwroot/default
+
+
+function CreatPHPTools()
+
+"Create PHP Info Tool..."
+cat >/home/wwwroot/default/phpinfo.php<<eof
+<?
+phpinfo();
+?>
+
+
+ "Copy PHP Prober..."
+       $cur_dir
+tar zxvf p.tar.gz
+cp p.php /home/wwwroot/default/p.php
+
+cp conf/index.html /home/wwwroot/default/index.html
+ "============================Install PHPMyAdmin================================="
+        tar zxf phpMyAdmin-lasest.tar.gz
+        mv phpMyAdmin-*-all-languages /home/wwwroot/default/phpmyadmin
+cp conf/config.inc.php /home/wwwroot/default/phpmyadmin/config.inc.php
+sed -i 's/LNMPORG/LNMP.org'$RANDOM'VPSer.net/g' /home/wwwroot/default/phpmyadmin/config.inc.php
+mkdir /home/wwwroot/default/phpmyadmin/upload/
+mkdir /home/wwwroot/default/phpmyadmin/save/
+chmod  -R /home/wwwroot/default/phpmyadmin/
+chown www:www -R /home/wwwroot/default/phpmyadmin/
+ "============================phpMyAdmin install completed================================="
+
+
+function AddAndStartup()
+
+"============================add nginx and php-fpm on startup============================"
+ "Download new nginx init.d file......"
+wget -c http://soft.vpser.net/lnmp/ext/init.d.nginx
+cp init.d.nginx /etc/init.d/nginx
+chmod +x /etc/init.d/nginx
+
+chkconfig --level  php-fpm on
+chkconfig --level  nginx on
+ [ "$isinstallmysql55" =  ]; 
+        chkconfig --level  mariadb on
+
+chkconfig --level  mysql on
+
+
+ [ "$isinstallmysql55" =  ]; 
+        sed -i 's:/etc/init.d/mysql:/etc/init.d/mariadb:g' /root/lnmp
+
+"===========================add nginx and php-fpm on startup completed===================="
+ "Starting LNMP..."
+ [ "$isinstallmysql55" =  ]; 
+        /etc/init.d/mariadb start
+
+/etc/init.d/mysql start
+
+/etc/init.d/php-fpm start
+/etc/init.d/nginx start
+
+function CheckInstall()
+
+"===================================== Check install ==================================="
+clear
+isnginx=
+ismysql=
+isphp=
+ "Checking..."
+ [  /usr/local/nginx/conf/nginx.conf ] && [  /usr/local/nginx/sbin/nginx ]; 
+   "Nginx: OK"
+  isnginx=
+
+"Error: /usr/local/nginx not found!!!Nginx install failed."
+
+
+ [  /usr/local/mysql/bin/mysql ] && [  /usr/local/mysql/bin/mysqld_safe ] && [  /etc/my.cnf ]; 
+   "MySQL: OK"
+  ismysql=
+
+"Error: /usr/local/mysql not found!!!MySQL install failed."
+
+
+ [  /usr/local/php/sbin/php-fpm ] && [  /usr/local/php/etc/php.ini ] && [  /usr/local/php/bin/php ]; 
+   "PHP: OK"
+   "PHP-FPM: OK"
+  isphp=
+
+"Error: /usr/local/php not found!!!PHP install failed."
+
+[ "$isnginx" =  ] && [ "$ismysql" =  ] && [ "$isphp" =  ]; 
+ "Install lnmp 0.1 completed! enjoy it."
+ "========================================================================="
+ "LNMP v0.1 for CentOS/RadHat Linux Server, Written by 邢文龙 "
+ "========================================================================="
+
+"For more information please contact 邢文龙 email:xingwenlong@hotyq.com"
+
+"lnmp status manage: /root/lnmp {start|stop|reload|restart|kill|status}"
+ "default mysql root password:$mysqlrootpwd"
+ "phpinfo : http://yourIP/phpinfo.php"
+ "phpMyAdmin : http://yourIP/phpmyadmin/"
+ "Prober : http://yourIP/p.php"
+ "Add VirtualHost : /root/vhost.sh"
+
+"The path of some dirs:"
+ "mysql dir:   /usr/local/mysql"
+ "php dir:     /usr/local/php"
+ "nginx dir:   /usr/local/nginx"
+ "web dir :     /home/wwwroot/default"
+
+"========================================================================="
+/root/lnmp status
+netstat -ntl
+
+"Sorry,Failed to install LNMP!"
+ "Please visit http://bbs.vpser.net/forum-25-1.html feedback errors and logs."
+ "You can download /root/lnmp-install.log from your server,and upload lnmp-install.log to LNMP Forum."
+
+InitInstall >& | tee /root/lnmp-install.log
+  CheckAndDownloadFiles >& | tee  /root/lnmp-install.log
+InstallDependsAndOpt >& | tee  /root/lnmp-install.log
+InstallMySQL55 >& | tee  /root/lnmp-install.log
+InstallPHP53 >& | tee  /root/lnmp-install.log
+InstallNginx >& | tee  /root/lnmp-install.log
+CreatPHPTools >& | tee  /root/lnmp-install.log
+AddAndStartup >& | tee  /root/lnmp-install.log
+CheckInstall >& | tee  /root/lnmp-install.log
+ "=========================== install Redis ======================"
+#Install Redis Stable Version
+function install_stable {
+ [  redis-. ]; 
+    rm -rf redis-./
+
+
+wget -c http://download.redis.io/releases/redis-..tar.gz
+tar zxf redis-..tar.gz
+ redis-./
+ [ `getconf WORD_BIT` =  ] && [ `getconf LONG_BIT` =  ] ; 
+        make PREFIX=/usr/local/redis install
+
+make CFLAGS="-march=i686" PREFIX=/usr/local/redis install
+
+mkdir -p /usr/local/redis/etc/
+cp redis.conf  /usr/local/redis/etc/
+sed -i 's/daemonize no/daemonize yes/g' /usr/local/redis/etc/redis.conf
+
+"=========================== install PHP-Redis ======================"
+function phpredis {
+         [  redis-. ]; 
+        rm -rf redis-./
+
+sed -i '/redis.so/d' /usr/local/php/etc/php.ini
+        wget -c http://pecl.php.net/get/redis-..tgz
+        tar zxf redis-..tgz
+         redis-./
+        /usr/local/php/bin/phpize
+        ./configure --with-php-config=/usr/local/php/bin/php-config
+        make && make install
+
+sed -i '/the dl()/i\
+extension = "redis.so"' /usr/local/php/etc/php.ini
+
+
+function startall {
+    rm  /etc/init.d/redis
+    wget -c http://soft.vpser.net/lnmp/ext/init.d.redis -O /etc/init.d/redis
+    chmod +x /etc/init.d/redis
+     "Add to auto start..."
+     [  /etc/debian_version ]; 
+    update-rc.d  redis defaults
+     [  /etc/redhat-release ]; 
+    chkconfig --level  redis on
+
+[  /etc/init.d/httpd ] && [  /usr/local/apache ]; 
+         "Restarting Apache......"
+        /etc/init.d/httpd restart
+
+"Restarting php-fpm......"
+        /etc/init.d/php-fpm restart
+
+/etc/init.d/redis start
+
+
+install_stable
+install_beta
+phpredis
+startall
+ "===================== install Redis completed ==================="
+
+printf "=========================== install memcached ======================\n"
+
+[  /usr/local/php/lib/php/extensions/no-debug-non-zts-20060613/memcache.so ]; 
+        rm  /usr/local/php/lib/php/extensions/no-debug-non-zts-20060613/memcache.so
+ [  /usr/local/php/lib/php/extensions/no-debug-non-zts-20090626/memcache.so ]; 
+        rm  /usr/local/php/lib/php/extensions/no-debug-non-zts-20090626/memcache.so
+ [  /usr/local/php/lib/php/extensions/no-debug-non-zts-20100525/memcache.so ]; 
+        rm  /usr/local/php/lib/php/extensions/no-debug-non-zts-20100525/memcache.so
+
+
+cur_php_version=`/usr/local/php/bin/php -v`
+
+"$cur_php_version" | grep -q "5.2."
+
+sed -i 's#extension_dir = "./"#extension_dir = "/usr/local/php/lib/php/extensions/no-debug-non-zts-20060613/"\nextension = "memcache.so"\n#' /usr/local/php/etc/php.ini
+  "$cur_php_version" | grep -q "5.3."
+
+sed -i 's#extension_dir = "./"#extension_dir = "/usr/local/php/lib/php/extensions/no-debug-non-zts-20090626/"\nextension = "memcache.so"\n#' /usr/local/php/etc/php.ini
+  "$cur_php_version" | grep -q "5.4."
+
+sed -i 's#extension_dir = "./"#extension_dir = "/usr/local/php/lib/php/extensions/no-debug-non-zts-20100525/"\nextension = "memcache.so"\n#' /usr/local/php/etc/php.ini
+
+"Error: can't get php version!"
+         "Maybe your php was didn't install or php configuration file has errors.Please check."
+        sleep 
+
+printf "=========================== install PHP-memcached ======================\n"
+
+"Install memcache php extension..."
+wget -c http://soft.vpser.net/web/memcache/memcache-..tgz
+tar zxvf memcache-..tgz
+ memcache-./
+/usr/local/php/bin/phpize
+./configure --with-php-config=/usr/local/php/bin/php-config
+make && make install
+
+
+wget -c http://soft.vpser.net/lib/libevent/libevent-.-stable.tar.gz
+tar zxvf libevent-.-stable.tar.gz
+ libevent-.-stable/
+./configure --prefix=/usr/local/libevent
+make&& make install
+
+
+ "/usr/local/libevent/lib/" >> /etc/ld.so.conf
+ln  /usr/local/libevent/lib/libevent-.so.  /lib/libevent-.so.
+ldconfig
+
+$cur_dir
+ "Install memcached..."
+wget -c http://soft.vpser.net/web/memcached/memcached-..tar.gz
+tar zxvf memcached-..tar.gz
+ memcached-./
+./configure --prefix=/usr/local/memcached
+make &&make install
+
+
+ln /usr/local/memcached/bin/memcached /usr/bin/memcached
+
+$cur_dir
+cp conf/memcached-init /etc/init.d/memcached
+chmod +x /etc/init.d/memcached
+useradd  /sbin/nologin nobody
+
+[ !  /var/lock/subsys ]; 
+  mkdir -p /var/lock/subsys
+
+
+ [  /etc/debian_version ]; 
+update-rc.d  memcached defaults
+ [  /etc/redhat-release ]; 
+chkconfig --level  memcached on
+
+
+ "Copy Memcached PHP Test file..."
+cp conf/memcached.php /home/wwwroot/default/memcached.php
+
+[  /etc/init.d/httpd ] && [  /usr/local/apache ]; 
+         "Restart Apache......"
+        /etc/init.d/httpd -k restart
+
+"Restart php-fpm......"
+        /etc/init.d/php-fpm restart
+
+
+ "Starting Memcached..."
+/etc/init.d/memcached start
+
+printf "===================== install Memcached completed =====================\n"
+printf "Install Memcached completed,enjoy it!\n"
+printf "You Can visit Memcached PHP Test file: http://ip/memcached.php\n"
+
+printf "===================== install PHP-solr扩展 =====================\n"
+    function phpsolr {
+             [  solr-. ]; 
+                    rm -rf solr-./
+
+sed -i '/redis.so/d' /usr/local/php/etc/php.ini
+            wget -c http://pecl.php.net/get/solr-..tgz
+            tar zxf solr-..tgz
+             solr-.
+            /usr/local/php/bin/phpize
+            ./configure --with-php-config=/usr/local/php/bin/php-config
+            make && make install
+
+sed -i '/the dl()/i\
+            extension = "solr.so"' /usr/local/php/etc/php.ini
+
+phpsolr
+    /etc/init.d/php-fpm restart
+printf "===================== install PHP-solr扩展成功 =====================\n"
+```
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

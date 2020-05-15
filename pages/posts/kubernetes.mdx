@@ -1,0 +1,152 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'Kubernetes架构概述',
+  date: '2018-03-13 21:27:00',
+  description: '',
+  image: 'https://wlimg.oss-cn-beijing.aliyuncs.com/img/k8s/1.jpeg!l',
+}
+
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/k8s/1.jpeg!l) 
+
+
+Kubernetes简介
+------------
+
+Kubernetes 是一个开源的、用于管理云平台中多个主机上的容器化的应用的调度系统，是一个用于容器应用的自动化部署、弹性伸缩、应用升级以及运维等的开源平台。Kubernetes是一种面向应用的系统，用于降低服务端应用的开发部署和运维成本。
+
+Kubernetes架构
+------------
+
+**始于编排而超越编排** ![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/k8s/2.png)
+
+    1. Declare Observe React
+    2. 一个状态存储
+    3. 多个控制器
+    
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/k8s/4.png)
+
+#### 优势
+
+1，最终一致性 2，组合特点 3，面向结果
+
+    apiVersion: VX
+    kind: API-Sla
+    metadata :
+        name :myservice-sla
+    spec :
+        percent : 99%
+        latency: 200ms
+        cost : x$/h
+        selector :
+            app: myapp
+    
+
+### Kubernetes网络
+
+1,容器之间可以直接互通，不需要 NAT 2,节点可以和容器直接互通，不需要 NAT 3,容器看到的⾃己 IP 应该和其他容器看到的⼀样
+
+    CNI(Container Network Interface)
+    - Flannel - Calico - Contiv
+    ClusterIP
+    - Virtual IP
+    - Iptables
+    
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/k8s/5.png)
+
+    {
+        "kind": "Service", 
+        "apiVersion": "v1", 
+        "metadata": {
+            "name": "my-service" 
+        },
+        "spec": { 
+            "selector": {
+                "app": "MyApp" 
+                },
+        "ports": [ 
+            {
+                "protocol": "TCP", 
+                "port": 80, 
+                "targetPort": 9376
+            } 
+        ]，
+        "clusterIP": "10.0.171.239", 
+        "type": “LoadBalancer 
+        } 
+    }
+    
+
+#### Flannel
+
+    Backend Type
+    1. udp
+    2. vxlan
+    3. host‐gw 4. aws‐vpc
+    
+
+![](https://wlimg.oss-cn-beijing.aliyuncs.com/img/k8s/6.png)
+
+#### Kubernetes网络故障排查
+
+1.确认同一主机上的pod网络是否互通，否，排查本机网络arp, iptables 2.确认跨主机pod网络是否互通 3.确认dns服务是否正常 4.确认请求Service ClusterIP是否正常(排查Service iptables) 5.确认pod到apiserver请求是否正常 6.确认出pod请求公网是否正常
+
+### Kubernetes Volume
+
+    apiVersion: v1
+    kind: Pod
+    metadata:
+        name: test-pd
+    spec :
+        containers :
+        - image : jolestar/go-probe
+            name : test-container
+            volumeMounts :
+            - mountPath : /cache I
+                name : cache-volume
+    volumes :
+    -   name :cache-volume
+        emptyDir: {}
+    
+
+gitRepo
+
+    volumes:
+        ‐ name: git‐volume
+            gitRepo:
+                repository: "git@xxxx:me/my‐repo.git"
+                revision: "22f1d8406d464"
+    
+
+NFS
+
+    volumes:
+        ‐ name: nfs‐volume
+            nfs:
+                path: /opt/nfs
+                server: nfs.f22
+    
+
+#### Kubernetes PersistentVolume
+
+Capacity Access Modes ReadWriteOnce ReadOnlyMany ReadWriteMany Mount Options Phase Available Bound Released Failed)
+
+    kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+        name: pvc
+    spec:
+        storageClassName: storageclass
+        persistentVolumeReclaimPolicy: Recycle
+        accessModes:
+            ‐ ReadWriteOnce
+        resources:
+         requests:
+                 storage: 3Gi
+
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>
