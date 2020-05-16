@@ -1,0 +1,16 @@
+import Layout from 'lib/components/layout'
+import { Button } from '@zeit-ui/react'
+
+export const meta = {
+  title: 'LINK',
+  date: '',
+  description: '',
+}
+
+[我的老博客](https://www.xingwenlong.com)
+[unix.bio](https://unix.bio)
+[Hank](b.hank.im)
+[哲熙](https://zexo.dev)
+[13c](https://corydon.cc)
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>
