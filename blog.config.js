@@ -14,7 +14,7 @@ const BLOG = {
   },
 
   email: 'resco365@gmail.com',
-  github: 'resco365',
+  github: 'mifanTeddy',
   domain: 'mifan.im',
   
   cn: true,
