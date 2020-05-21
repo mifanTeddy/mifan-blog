@@ -6,10 +6,7 @@ const withMDX = require('@next/mdx')({
 })
 
 const nextConfig = {
-    target: 'serverless',
-    devIndicators: {
-        autoPrerender: false,
-    },
+  target: 'serverless',
   
   pageExtensions: ['jsx', 'js', 'mdx', 'md', 'ts', 'tsx'],
   
