@@ -1,0 +1,49 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'Linux性能优化',
+  date: '2020-07-27 18:44:00',
+  description: '',
+  image: '',
+}
+
+
+性能优化的目的：“高并发”和“响应快”
+性能优化的指标：“吞吐”和“延时”
+
+我们知道，随着应用负载的增加，系统资源的使用也会升高，甚至达到极限。而性能问题的本质，就是系统资源已经达到瓶颈，但请求的处理却还不够快，无法支撑更多的请求。
+
+性能分析，其实就是找出应用或系统的瓶颈，并设法去避免或者缓解它们，从而更高效地利用系统资源处理更多的请求。这包含了一系列的步骤，比如下面这六个步骤。
+> 选择指标评估应用程序和系统的性能；
+
+> 为应用程序和系统设置性能目标；
+
+> 进行性能基准测试；
+
+> 性能分析定位瓶颈；
+
+> 优化系统和应用程序；
+
+> 性能监控和告警。
+
+![性能工具](https://wlimg.oss-cn-beijing.aliyuncs.com/img/CPU/tools.png)
+
+（图片来自brendangregg.com）
+
+这个图是 Linux 性能分析最重要的参考资料之一，它告诉你，在 Linux 不同子系统出现性能问题后，应该用什么样的工具来观测和分析。比如，当遇到 I/O 性能问题时，可以参考图片最下方的 I/O 子系统，使用 iostat、iotop、blktrace 等工具分析磁盘 I/O 的瓶颈。
+
+
+以下是一张思维导图，里面涵盖了大部分性能分析和优化都会包含的知识
+
+![知识](https://wlimg.oss-cn-beijing.aliyuncs.com/img/CPU/xmind.png)
+
+
+[CPU性能优化](/performance/cpu)
+
+[内存性能优化](/performance/mem)
+
+
+
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>
