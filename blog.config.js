@@ -3,7 +3,7 @@ const BLOG = {
   author: 'Teddy',
   title: 'Mifan - bio',
   description: 'Hi, I\'m Teddy. A full stack and blockchain engineer',
-  summary: '数据架构师和区块链工程师，对一切改变世界的技术感兴趣。',
+  summary: '区块链工程师，对一切改变世界的技术感兴趣。',
   language: 'zh-cn',
   latestLimit: 5,
 
