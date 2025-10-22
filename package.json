@@ -8,8 +8,8 @@
   "scripts": {
     "start": "npm run collect && next dev",
     "dev": "npm run collect && next dev",
-    "build": "NODE_OPTIONS=--openssl-legacy-provider npm run collect && next build",
-    "now-build": "NODE_OPTIONS=--openssl-legacy-provider npm run collect && next build",
+    "build": "sh -c 'export BROWSERSLIST_IGNORE_OLD_DATA=1 NODE_OPTIONS=--openssl-legacy-provider; npm run collect && next build'",
+    "now-build": "sh -c 'export BROWSERSLIST_IGNORE_OLD_DATA=1 NODE_OPTIONS=--openssl-legacy-provider; npm run collect && next build'",
     "post": "node scripts/create.js",
     "collect": "node scripts/collect-meta.js",
     "export": "npm run now-build && next export"
