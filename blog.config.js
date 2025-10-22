@@ -2,8 +2,8 @@
 const BLOG = {
   author: 'Teddy',
   title: 'Mifan - bio',
-  description: 'Hi, I\'m Teddy. A full stack and blockchain engineer',
-  summary: '区块链工程师，对一切改变世界的技术感兴趣。',
+  description: 'Hi, I\'m Teddy. A full stack and web3 AI agent engineer',
+  summary: 'web3 ai agent 工程师，对一切改变世界的技术感兴趣。',
   language: 'zh-cn',
   latestLimit: 5,
 
