@@ -2,6 +2,9 @@
   "name": "teddy",
   "version": "0.0.1",
   "private": true,
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "start": "npm run collect && next dev",
     "dev": "npm run collect && next dev",
