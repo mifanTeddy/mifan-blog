@@ -19,7 +19,6 @@ const Page = () => (
   <Layout>
     <div className="nav-wrapper">
       <h1>站点导航</h1>
-      <p>以下链接来自固定页 LINK（已排除友链），并加入了 Blog 自身入口。</p>
       <div className="nav-grid">
         {links.map((item) => (
           <a
@@ -42,11 +41,6 @@ const Page = () => (
 
       h1 {
         margin: 0;
-      }
-
-      p {
-        opacity: 0.7;
-        margin: 8px 0 18px;
       }
 
       .nav-grid {
