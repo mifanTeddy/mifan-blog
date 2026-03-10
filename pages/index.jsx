@@ -3,6 +3,7 @@ import Layout from 'lib/components/layout'
 const links = [
   { name: 'Blog 博客', url: '/blog', description: '原博客文章列表' },
   { name: 'Daily 日报', url: 'https://daily.mifan.im/', description: '每日内容聚合' },
+  { name: 'Games 游戏', url: 'https://games.mifan.im/', description: '小游戏与网页游戏导航' },
   { name: 'Disperse', url: 'https://disperse.mifan.im/', description: '分发工具' },
   { name: '生成艺术', url: 'https://art.mifan.im/', description: 'Generative Art' },
   { name: '猫头像', url: 'https://cat.mifan.im/', description: '随机猫头像' },
