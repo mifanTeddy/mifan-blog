@@ -17,6 +17,7 @@ const links = [
       { name: '猪头像', url: 'https://pig.mifan.im/' },
     ],
   },
+  { name: 'Meme', url: 'https://meme.mifan.im/', description: '梗图编辑与导出' },
   { name: 'Muscle', url: 'https://muscle.mifan.im/', description: '训练肌肉图谱' },
   { name: '工具', url: 'https://tools.mifan.im/', description: 'Tools 集合' },
   { name: '退休', url: 'https://tuixiu.mifan.im/', description: '退休计算器' },
@@ -24,7 +25,7 @@ const links = [
   { name: 'Focus', url: 'https://focus.mifan.im/', description: '专注计时与配置导入导出' },
   { name: 'Draw', url: 'https://draw.mifan.im/', description: '权重抽签和多人分组' },
   { name: 'Streak', url: 'https://streak.mifan.im/', description: '习惯打卡与连续天数追踪' },
-  { name: 'Meal', url: 'https://meal.mifan.im/', description: '后端更新驱动的餐食推荐' },
+  { name: 'Meal', url: 'https://meal.mifan.im/', description: '餐食推荐' },
   { name: 'Resume', url: 'https://resume.mifan.im/', description: '个人简历' },
 ]
 
