@@ -6,6 +6,7 @@ const links = [
   { name: 'Games 游戏', url: 'https://games.mifan.im/', description: '小游戏与网页游戏导航' },
   { name: 'Disperse', url: 'https://disperse.mifan.im/', description: '分发工具' },
   { name: 'Avatar', url: 'https://avatar.mifan.im/', description: 'Notion 风格头像编辑器' },
+  { name: 'Maple Doll', url: 'https://maple.mifan.im/', description: '冒险岛纸娃娃换装' },
   { name: '生成艺术', url: 'https://art.mifan.im/', description: 'Generative Art' },
   {
     name: '头像乐园',
