@@ -23,6 +23,7 @@ const links = [
   { name: 'Muscle', url: 'https://muscle.mifan.im/', description: '训练肌肉图谱' },
   { name: '工具', url: 'https://tools.mifan.im/', description: 'Tools 集合' },
   { name: 'Math', url: 'https://math.mifan.im/', description: '数学知识与公式工具' },
+  { name: 'Physics', url: 'https://physics.mifan.im/', description: '物理知识与公式工具' },
   { name: '退休', url: 'https://tuixiu.mifan.im/', description: '退休计算器' },
   { name: '这个B班值不值得上', url: 'https://worthjob.mifan.im/', description: '工作价值评估' },
   { name: 'Focus', url: 'https://focus.mifan.im/', description: '专注计时与配置导入导出' },
